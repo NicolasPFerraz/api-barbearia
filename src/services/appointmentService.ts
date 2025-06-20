@@ -3,13 +3,13 @@ import { Appointment } from '../types/appointment';
 import { DateTime } from 'luxon';
 
 export async function createAppointment(data: Appointment) {
+  console.log('Dados recebidos:', data);
   const { customer_name, customer_phone, service_id, start_time, appointment_date } = data;
 
-  // 👉 Ajustar o start_time para incluir fuso horário (ex: America/Sao_Paulo)
-  const localStart = DateTime.fromISO(start_time, { zone: 'America/Sao_Paulo' });
-  const startTimeWithTZ = localStart.toUTC().toISO(); // salva em UTC
+  // Logs para depuração
+  console.log('appointment_date:', appointment_date);
+  console.log('start_time:', start_time);
 
-  // Buscar a duração do serviço na tabela services
   const serviceResult = await pool.query(
     `SELECT duration FROM services WHERE id = $1`,
     [service_id]
@@ -23,13 +23,13 @@ export async function createAppointment(data: Appointment) {
 
   const result = await pool.query(
     `INSERT INTO appointments (customer_name, customer_phone, service_id, start_time, appointment_date, duration)
-   VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-    [customer_name, customer_phone, service_id, startTimeWithTZ, appointment_date, duration]
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+    [customer_name, customer_phone, service_id, start_time, appointment_date, duration]
   );
   return result.rows[0];
 }
 
-export async function getAvailableSlots(date: string, service_id: string, barber: string) {
+export async function getAvailableSlots(date: string, service_id: string) {
   // 1. Buscar duração do serviço solicitado
   const serviceResult = await pool.query(
     `SELECT duration FROM services WHERE id = $1`,
@@ -43,7 +43,7 @@ export async function getAvailableSlots(date: string, service_id: string, barber
   // 2. Buscar todos os agendamentos do barbeiro para o dia
   const appointmentsResult = await pool.query(
     `SELECT start_time, duration FROM appointments WHERE appointment_date = $1 AND barber = $2`,
-    [date, barber]
+    [date]
   );
   const appointments = appointmentsResult.rows;
 
