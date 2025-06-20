@@ -12,11 +12,11 @@ export const createAppointment = async (req: Request, res: Response) => {
 
 export const getAvailableSlots = async (req: Request, res: Response) => {
   try {
-    const { date, service, barber } = req.query;
+    const { appointment_date, service_id, barber_id } = req.body;
     const slots = await appointmentService.getAvailableSlots(
-      String(date),
-      String(service),
-      String(barber)
+      appointment_date,
+      barber_id,
+      service_id
     );
     res.json(slots);
   } catch (error) {

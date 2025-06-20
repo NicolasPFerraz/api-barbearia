@@ -4,4 +4,5 @@ export interface Appointment {
   service_id: string;
   start_time: string;
   appointment_date: string;
+  barber_id?: string;
 }
