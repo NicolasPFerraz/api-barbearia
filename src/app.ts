@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import appointmentRoutes from './routes/appointmentRoutes';
+import adminRoutes from './routes/adminRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,6 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api', appointmentRoutes);
+app.use('/admin', adminRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
@@ -19,5 +21,5 @@ app.get('/', (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`> Server is running on http://localhost:${PORT}`);
 });
