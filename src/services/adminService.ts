@@ -29,3 +29,13 @@ export async function deleteAppointment(id: string) {
     throw error;
   }
 }
+
+export async function updateAppointmentStatus(id: string, status: string): Promise<boolean> {
+  try {
+    const result = await pool.query('UPDATE appointments SET status = $1 WHERE id = $2', [status, id]);
+    return (result.rowCount ?? 0) > 0; 
+  } catch (error) {
+    console.error('Error updating appointment status:', error);
+    throw error;
+  }
+}
