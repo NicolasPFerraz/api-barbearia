@@ -1,11 +1,51 @@
 import { pool } from '../db';
 import { Appointment } from '../types/appointment';
 
+async function checkClientExists(client_phone: string): Promise<boolean> {
+  try {
+    const result = await pool.query(
+      `SELECT id FROM clients WHERE phone_number = $1`,
+      [client_phone]
+    );
+    return (result.rowCount ?? 0) > 0;
+  } catch (error) {
+    console.error('Error checking client existence:', error);
+    throw error;
+  }
+}
+
+async function createClient(client_name: string, client_phone: string): Promise<number> {
+  try {
+    const result = await pool.query(
+      `INSERT INTO clients (name, phone_number, total_appointments) VALUES ($1, $2, $3) RETURNING id`,
+      [client_name, client_phone, 1]
+    );
+    return result.rows[0].id;
+  } catch (error) {
+    console.error('Error creating client:', error);
+    throw error;
+  }
+}
+
 // Função para criar um novo agendamento
 export async function createAppointment(data: Appointment) {
   try {
     // Desestrutura os dados do agendamento
-    let { customer_name, customer_phone, service_id, start_time, appointment_date, barber_id } = data;
+    let { client_name, client_phone, service_id, start_time, appointment_date, barber_id } = data;
+    let client_id: number;
+
+    // Verifica se o cliente já está cadastrado
+    const clientExists = await checkClientExists(client_phone);
+    if (!clientExists) {
+      client_id = await createClient(client_name, client_phone);
+      console.log(`Novo cliente ${client_name} criado com sucesso.`);
+    } else {
+      const clientResult = await pool.query(
+        `SELECT id FROM clients WHERE phone_number = $1`,
+        [client_phone]
+      );
+      client_id = clientResult.rows[0].id;
+    }
 
     // Busca a duração do serviço no banco de dados
     const serviceResult = await pool.query(
@@ -31,11 +71,11 @@ export async function createAppointment(data: Appointment) {
 
     // Insere o agendamento no banco de dados
     const result = await pool.query(
-      `INSERT INTO appointments (customer_name, customer_phone, service_id, start_time, appointment_date, duration, barber_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [customer_name, customer_phone, service_id, start_time, appointment_date, duration, barber_id]
+      `INSERT INTO appointments (client_id, service_id, barber_id, appointment_date, start_time, duration)
+      VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [client_id, service_id, barber_id, appointment_date, start_time, duration]
     );
-    // Retorna o agendamento criado
+
     return result.rows[0];
   } catch (error) {
     // Loga e repassa o erro
