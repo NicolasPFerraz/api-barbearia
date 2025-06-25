@@ -1,6 +1,18 @@
 import { pool } from '../db';
 import { Appointment } from '../types/appointment';
 
+async function incrementClientAppointments(client_id: number): Promise<void> {
+  try {
+    await pool.query(
+      `UPDATE clients SET total_appointments = total_appointments + 1 WHERE id = $1`,
+      [client_id]
+    );
+  } catch (error) {
+    console.error('Error incrementing client appointments:', error);
+    throw error;
+  }
+}
+
 async function checkClientExists(client_phone: string): Promise<boolean> {
   try {
     const result = await pool.query(
@@ -52,6 +64,8 @@ export async function createAppointment(data: Appointment) {
       `SELECT duration FROM services WHERE id = $1`,
       [service_id]
     );
+
+    incrementClientAppointments(client_id); 
 
     // Se não encontrar o serviço, lança erro
     if (serviceResult.rowCount === 0) {
