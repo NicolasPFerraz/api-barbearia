@@ -3,8 +3,13 @@ import { pool } from '../db';
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
+const tokenOptions = {
+  secretKey: process.env.JWT_SECRET,
+  expiresIn: process.env.JWT_EXPIRATION || '1h',
+};
+
 export const generateJwtToken = async (id: string): Promise<string> => {
-  const token = await jwt.sign({ id }, 'chave-super-secreta', { expiresIn: '7d' });
+  const token = await jwt.sign({ id }, tokenOptions.secretKey, { expiresIn: tokenOptions.expiresIn });
   return token;
 }
 
@@ -23,7 +28,6 @@ export const authenticate = async (username: string, password: string): Promise<
     const token = await generateJwtToken(admin.rows[0].id);
 
     console.log(`Admin ${username} authenticated successfully.`);
-    console.log(`Generated JWT token: ${token}`);
     return token;
   } catch (error) {
     console.error('Error authenticating admin:', error);
