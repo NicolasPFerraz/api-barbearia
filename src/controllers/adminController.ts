@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as adminService from '../services/adminService';
+import * as authService from '../services/authService';
 
 export const getAdminDashboard = async (req: Request, res: Response) => {
   try {
@@ -30,3 +31,13 @@ export const updateAppointmentStatus = async (req: Request, res: Response) => {
     res.status(400).json({ error });
   }
 };
+
+export const loginAdmin = async (req: Request, res: Response) => {
+  try {
+    const { username, password } = req.body;
+    const token = await authService.authenticate(username, password);
+    res.status(200).json({ token });
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid credentials' });
+  }
+}
