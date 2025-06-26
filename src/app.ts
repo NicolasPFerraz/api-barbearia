@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+
 import appointmentRoutes from './routes/appointmentRoutes';
 import adminRoutes from './routes/adminRoutes';
 
@@ -10,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors()); // Permite todas as origens por padrão
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); 
 
 // Routes
 app.use('/api', appointmentRoutes);
