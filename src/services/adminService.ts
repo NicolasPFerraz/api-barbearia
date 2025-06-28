@@ -1,4 +1,5 @@
 import { pool } from '../db';
+import { ApiError } from '../utils/errorHandler';
 import { Appointment } from '../types/appointment';
 
 export async function fetchAllAppointments() {
@@ -17,25 +18,37 @@ export async function fetchAllAppointments() {
     return result.rows;
   } catch (error) {
     console.error('Error fetching appointments:', error);
-    throw error;
+    throw new ApiError(500, 'Erro ao buscar agendamentos.');
   }
 }
 
 export async function deleteAppointment(id: string) {
   try {
-    await pool.query('DELETE FROM appointments WHERE id = $1', [id]);
+    const result = await pool.query('DELETE FROM appointments WHERE id = $1', [id]);
+    if (result.rowCount === 0) {
+      throw new ApiError(404, 'Agendamento não encontrado.');
+    }
   } catch (error) {
     console.error('Error deleting appointment:', error);
-    throw error;
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(500, 'Erro ao deletar agendamento.');
   }
 }
 
 export async function updateAppointmentStatus(id: string, status: string): Promise<boolean> {
   try {
     const result = await pool.query('UPDATE appointments SET status = $1 WHERE id = $2', [status, id]);
-    return (result.rowCount ?? 0) > 0; 
+    if ((result.rowCount ?? 0) === 0) {
+      throw new ApiError(404, 'Agendamento não encontrado.');
+    }
+    return true; 
   } catch (error) {
     console.error('Error updating appointment status:', error);
-    throw error;
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(500, 'Erro ao atualizar status do agendamento.');
   }
 }

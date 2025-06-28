@@ -1,4 +1,5 @@
 import { pool } from '../db';
+import { ApiError } from '../utils/errorHandler';
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -14,25 +15,20 @@ export const generateJwtToken = async (id: string): Promise<string> => {
 }
 
 export const authenticate = async (username: string, password: string): Promise<string> => {
-  try {
-    const admin = await pool.query('SELECT * FROM admins WHERE username = $1', [username]);
-    if (admin.rows.length === 0) {
-      throw new Error('Admin not found');
-    } 
+  const admin = await pool.query('SELECT * FROM admins WHERE username = $1', [username]);
+  if (admin.rows.length === 0) {
+    throw new ApiError(401, 'Credenciais inválidas.');
+  } 
 
-    const isValidPassword = await bcrypt.compare(password, admin.rows[0].password_hash);
-    if (!isValidPassword) {
-      throw new Error('Invalid password');
-    }
-
-    const token = await generateJwtToken(admin.rows[0].id);
-
-    console.log(`Admin ${username} authenticated successfully.`);
-    return token;
-  } catch (error) {
-    console.error('Error authenticating admin:', error);
-    throw error;
+  const isValidPassword = await bcrypt.compare(password, admin.rows[0].password_hash);
+  if (!isValidPassword) {
+    throw new ApiError(401, 'Credenciais inválidas.');
   }
+
+  const token = await generateJwtToken(admin.rows[0].id);
+
+  console.log(`Admin ${username} authenticated successfully.`);
+  return token;
 }
 
 export const verifyToken = async (token: string): Promise<boolean> => {
@@ -41,7 +37,6 @@ export const verifyToken = async (token: string): Promise<boolean> => {
     console.log('Token is valid:', decoded);
     return true;
   } catch (error) {
-    console.error('Token verification failed:', error);
-    return false;
+    throw new ApiError(401, 'Token inválido ou expirado.');
   }
 }

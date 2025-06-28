@@ -1,4 +1,5 @@
 import { pool } from '../db';
+import { ApiError } from '../utils/errorHandler';
 import { Appointment } from '../types/appointment';
 
 async function incrementClientAppointments(client_id: number): Promise<void> {
@@ -9,7 +10,10 @@ async function incrementClientAppointments(client_id: number): Promise<void> {
     );
   } catch (error) {
     console.error('Error incrementing client appointments:', error);
-    throw error;
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(500, 'Erro ao incrementar agendamentos do cliente.');
   }
 }
 
@@ -22,7 +26,10 @@ async function checkClientExists(client_phone: string): Promise<boolean> {
     return (result.rowCount ?? 0) > 0;
   } catch (error) {
     console.error('Error checking client existence:', error);
-    throw error;
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(500, 'Erro ao verificar existência do cliente.');
   }
 }
 
@@ -35,7 +42,10 @@ async function createClient(client_name: string, client_phone: string): Promise<
     return result.rows[0].id;
   } catch (error) {
     console.error('Error creating client:', error);
-    throw error;
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(500, 'Erro ao criar cliente.');
   }
 }
 
@@ -69,7 +79,7 @@ export async function createAppointment(data: Appointment) {
 
     // Se não encontrar o serviço, lança erro
     if (serviceResult.rowCount === 0) {
-      throw new Error('Service not found');
+      throw new ApiError(404, 'Serviço não encontrado.');
     }
 
     // Pega a duração do serviço
@@ -79,7 +89,7 @@ export async function createAppointment(data: Appointment) {
     if (barber_id === '') {
       barber_id = await findAvailableBarber(appointment_date, start_time, service_id);
       if (!barber_id) {
-        throw new Error('No available barber found for the selected time and service');
+        throw new ApiError(400, 'Nenhum barbeiro disponível para o horário e serviço selecionados.');
       }
     }
 
@@ -94,7 +104,10 @@ export async function createAppointment(data: Appointment) {
   } catch (error) {
     // Loga e repassa o erro
     console.error('Error creating appointment:', error);
-    throw error;
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(500, 'Erro ao criar agendamento.');
   }
 }
 
@@ -107,7 +120,7 @@ export async function getAvailableSlots(appointment_date: string, barber_id: str
       [service_id]
     );
     if (serviceResult.rowCount === 0) {
-      throw new Error('Serviço não encontrado');
+      throw new ApiError(404, 'Serviço não encontrado.');
     }
     const serviceDuration = serviceResult.rows[0].duration;
 
@@ -184,7 +197,10 @@ export async function getAvailableSlots(appointment_date: string, barber_id: str
   } catch (error) {
     // Loga e repassa o erro
     console.error('Error fetching available slots:', error);
-    throw error;
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(500, 'Erro ao buscar horários disponíveis.');
   }
 }
 
@@ -196,7 +212,7 @@ export async function findAvailableBarber(appointment_date: string, start_time: 
     [service_id]
   );
   if (serviceResult.rowCount === 0) {
-    throw new Error('Serviço não encontrado');
+    throw new ApiError(404, 'Serviço não encontrado.');
   }
   const duration = serviceResult.rows[0].duration;
 

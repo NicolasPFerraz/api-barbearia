@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import * as appointmentService from '../services/appointmentService';
+import { ApiError, handleError } from '../utils/errorHandler';
 
 export const createAppointment = async (req: Request, res: Response) => {
   try {
     const appointment = await appointmentService.createAppointment(req.body);
     res.status(201).json(appointment);
-  } catch (error) {
-    console.error('Error creating appointment:', error);
-    res.status(400).json({ error });
+  } catch (error: any) {
+    handleError(error, res);
   }
 };
 
@@ -20,8 +20,7 @@ export const getAvailableSlots = async (req: Request, res: Response) => {
       service_id
     );
     res.json(slots);
-  } catch (error) {
-    console.error('Error fetching available slots:', error);
-    res.status(400).json({ error });
+  } catch (error: any) {
+    handleError(error, res);
   }
 };

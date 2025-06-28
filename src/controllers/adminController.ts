@@ -1,15 +1,14 @@
 import { Request, Response } from 'express';
 import * as adminService from '../services/adminService';
 import * as authService from '../services/authService';
-import { CookieOptions } from 'express';
+import { ApiError, handleError } from '../utils/errorHandler';
 
 export const getAdminDashboard = async (req: Request, res: Response) => {
   try {
     const data = await adminService.fetchAllAppointments();
     res.status(200).json(data);
-  } catch (error) {
-    console.error('Error fetching admin dashboard data:', error);
-    res.status(400).json({ error });
+  } catch (error: any) {
+    handleError(error, res);
   }
 };
 
@@ -18,9 +17,8 @@ export const deleteAppointment = async (req: Request, res: Response) => {
     const { id } = req.params;
     await adminService.deleteAppointment(id);
     res.status(204).send();
-  } catch (error) {
-    console.error('Error deleting appointment:', error);
-    res.status(400).json({ error });
+  } catch (error: any) {
+    handleError(error, res);
   }
 };
 
@@ -30,9 +28,8 @@ export const updateAppointmentStatus = async (req: Request, res: Response) => {
     const { status } = req.body;
     await adminService.updateAppointmentStatus(id, status);
     res.status(200).send();
-  } catch (error) {
-    console.error('Error updating appointment status:', error);
-    res.status(400).json({ error });
+  } catch (error: any) {
+    handleError(error, res);
   }
 };
 
@@ -50,9 +47,8 @@ export const loginAdmin = async (req: Request, res: Response) => {
     });
 
     res.status(200).json({ message: 'Login realizado com sucesso', token });
-  } catch (error) {
-    console.error('Error doing login:', error);
-    res.status(401).json({ error });
+  } catch (error: any) {
+    handleError(error, res);
   }
 }
 
@@ -61,17 +57,16 @@ export const checkAdmin = async (req: Request, res: Response) => {
     const token = req.cookies?.auth_token;
 
     if (!token) {
-      throw new Error('Unauthorized');
+      throw new ApiError(401, 'Não autorizado.');
     }
 
     const isValid = await authService.verifyToken(token);
 
     if (!isValid) {
-      throw new Error('Token inválido ou expirado');
+      throw new ApiError(401, 'Token inválido ou expirado.');
     }
     res.status(200).json({ authenticated: true });
-  } catch (error) {
-    console.error('Error checking admin:', error);
-    res.status(401).json({ authenticated: false });
+  } catch (error: any) {
+    handleError(error, res);
   }
 }
