@@ -6,6 +6,7 @@ export const createAppointment = async (req: Request, res: Response) => {
     const appointment = await appointmentService.createAppointment(req.body);
     res.status(201).json(appointment);
   } catch (error) {
+    console.error('Error creating appointment:', error);
     res.status(400).json({ error });
   }
 };
@@ -20,6 +21,7 @@ export const getAvailableSlots = async (req: Request, res: Response) => {
     );
     res.json(slots);
   } catch (error) {
+    console.error('Error fetching available slots:', error);
     res.status(400).json({ error });
   }
 };

@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const tokenOptions = {
-  secretKey: process.env.JWT_SECRET,
+  secretKey: process.env.JWT_SECRET || 'secretKey',
   expiresIn: process.env.JWT_EXPIRATION || '1h',
 };
 
