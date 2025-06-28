@@ -34,3 +34,14 @@ export const authenticate = async (username: string, password: string): Promise<
     throw error;
   }
 }
+
+export const verifyToken = async (token: string): Promise<boolean> => {
+  try {
+    const decoded = await jwt.verify(token, tokenOptions.secretKey);
+    console.log('Token is valid:', decoded);
+    return true;
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    return false;
+  }
+}

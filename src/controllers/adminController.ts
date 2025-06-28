@@ -43,8 +43,8 @@ export const loginAdmin = async (req: Request, res: Response) => {
 
     res.cookie('auth_token', token, {
       httpOnly: true,
-      secure: false, // em localhost
-      sameSite: 'lax', // ou 'strict'
+      secure: false,
+      sameSite: 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -53,5 +53,25 @@ export const loginAdmin = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error doing login:', error);
     res.status(401).json({ error });
+  }
+}
+
+export const checkAdmin = async (req: Request, res: Response) => {
+  try {
+    const token = req.cookies?.auth_token;
+
+    if (!token) {
+      throw new Error('Unauthorized');
+    }
+
+    const isValid = await authService.verifyToken(token);
+
+    if (!isValid) {
+      throw new Error('Token inválido ou expirado');
+    }
+    res.status(200).json({ authenticated: true });
+  } catch (error) {
+    console.error('Error checking admin:', error);
+    res.status(401).json({ authenticated: false });
   }
 }
