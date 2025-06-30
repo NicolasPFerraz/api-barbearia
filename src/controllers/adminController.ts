@@ -27,7 +27,7 @@ export const updateAppointmentStatus = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { status } = req.body;
     await adminService.updateAppointmentStatus(id, status);
-    res.status(200).send();
+    res.status(204).send();
   } catch (error: any) {
     handleError(error, res);
   }
