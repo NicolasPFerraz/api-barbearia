@@ -52,6 +52,20 @@ export const loginAdmin = async (req: Request, res: Response) => {
   }
 }
 
+export const logoutAdmin = async (req: Request, res: Response) => {
+  try {
+    res.clearCookie('auth_token', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+    });
+
+    res.status(200).json({ message: 'Logout realizado com sucesso' });
+  } catch (error: any) {
+    handleError(error, res);
+  }
+}
+
 export const checkAdmin = async (req: Request, res: Response) => {
   try {
     const token = req.cookies?.auth_token;
