@@ -9,10 +9,13 @@ export async function fetchAllAppointments() {
         a.*, 
         s.name as service_name,
         s.price as service_price,
-        b.name as barber_name
+        b.name as barber_name,
+        c.name as client_name,
+        c.phone_number as client_phone_number
       FROM appointments a
       JOIN services s ON a.service_id = s.id
       LEFT JOIN barbers b ON a.barber_id = b.id
+      JOIN clients c ON a.client_id = c.id
       ORDER BY a.appointment_date ASC, a.start_time ASC
     `);
     return result.rows;
