@@ -5,4 +5,6 @@ export interface Appointment {
   start_time: string;
   appointment_date: string;
   barber_id: string;
+  payment_method: string;
+  notes: string;
 }

@@ -53,7 +53,7 @@ async function createClient(client_name: string, client_phone: string): Promise<
 export async function createAppointment(data: Appointment) {
   try {
     // Desestrutura os dados do agendamento
-    let { client_name, client_phone, service_id, start_time, appointment_date, barber_id } = data;
+    let { client_name, client_phone, service_id, start_time, appointment_date, barber_id, payment_method, notes } = data;
     let client_id: number;
 
     // Verifica se o cliente já está cadastrado
@@ -95,9 +95,9 @@ export async function createAppointment(data: Appointment) {
 
     // Insere o agendamento no banco de dados
     const result = await pool.query(
-      `INSERT INTO appointments (client_id, service_id, barber_id, appointment_date, start_time, duration)
-      VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [client_id, service_id, barber_id, appointment_date, start_time, duration]
+      `INSERT INTO appointments (client_id, service_id, barber_id, appointment_date, start_time, duration, payment_method, notes)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [client_id, service_id, barber_id, appointment_date, start_time, duration, payment_method, notes]
     );
 
     return result.rows[0];
