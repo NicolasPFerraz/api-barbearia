@@ -34,4 +34,4 @@ Sinta-se à vontade para contribuir com melhorias ou correções. Para isso, fa�
 
 ## Licença
 
-Este projeto está licenciado sob a MIT License. Veja o arquivo LICENSE para mais detalhes.
+Este projeto está licenciado sob a MIT License. Veja o arquivo LICENSE para mais detalhes.# barbearia
