@@ -1,6 +1,6 @@
-# Backend API Documentation
+# API Documentation
 
-Este diretório contém a implementação do backend da aplicação, que é construído utilizando Node.js e Express. Abaixo estão as informações sobre a estrutura do backend e como utilizá-lo.
+Este diretório contém a implementação do backend da aplicação "barbearia", que foi construído utilizando Node.js e Express. Abaixo estão as informações sobre a estrutura do backend e como utilizá-lo.
 
 ## Estrutura do Diretório
 
