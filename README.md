@@ -28,10 +28,31 @@ npm start
 
 O servidor estará disponível em `http://localhost:3000` (ou outra porta configurada).
 
+## Endpoints
+
+A seguir estão os endpoints disponíveis na API, agrupados por funcionalidade.
+
+### Autenticação (`/auth`)
+
+- **POST /login**: Autentica um administrador.
+- **POST /logout**: Desconecta um administrador.
+- **POST /check**: Verifica se um administrador está autenticado.
+
+### Agendamentos (`/appointments`)
+
+- **POST /**: Cria um novo agendamento.
+- **POST /available**: Obtém os horários disponíveis para agendamento.
+
+### Administração (`/admin`)
+
+- **POST /dashboard**: Acessa o painel de administração.
+- **DELETE /deleteAppointment/:id**: Exclui um agendamento.
+- **PATCH /updateAppointmentStatus/:id**: Atualiza o status de um agendamento.
+
 ## Contribuição
 
 Sinta-se à vontade para contribuir com melhorias ou correções. Para isso, faça um fork do repositório e envie um pull request.
 
 ## Licença
 
-Este projeto está licenciado sob a MIT License. Veja o arquivo LICENSE para mais detalhes.# barbearia
+Este projeto está licenciado sob a MIT License. Veja o arquivo LICENSE para mais detalhes.
